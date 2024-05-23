@@ -1,0 +1,53 @@
+commit fc3a0258dd70060c79a7b625b7862ca56e16ff6a
+Author: GAnderson <garronanderson4321@gmail.com>
+Date:   Mon Jul 3 14:49:51 2023 -0500
+
+    Added support for reading characters. Shifting works but no modding.
+
+commit e010ece44a49597a3cc48d75d0079649e9be14cd
+Author: GAnderson <garronanderson4321@gmail.com>
+Date:   Mon Jun 26 15:20:17 2023 -0500
+
+    Added input_lookup to codes.py
+
+commit 2277d1e78a9bd1a694c8b6b9a7f464ca6c238676
+Author: GAnderson <garronanderson4321@gmail.com>
+Date:   Sat Jun 24 17:11:15 2023 -0500
+
+    Added logging support and tested email.
+
+commit d5903f2a8908a655178c019aad4bd27813f39ab5
+Author: GAnderson <garronanderson4321@gmail.com>
+Date:   Thu Jun 22 17:22:01 2023 -0500
+
+    Started work on a Gmail test.
+
+commit 9037ebcb0b441cfab7ef322b460ad8e7605fd44b
+Author: GAnderson <garronanderson4321@gmail.com>
+Date:   Thu Jun 22 17:07:58 2023 -0500
+
+    Added entries for Gmail credentials to .gitignore.
+
+commit 53586baf6a3760504301eabaeb46749439a3cd9d
+Author: GAnderson <garronanderson4321@gmail.com>
+Date:   Tue Jun 20 16:17:50 2023 -0500
+
+    Fixed shiftedprinting codes. Made print function variadic and able to cope with most if not all objects.
+
+commit 5ffaa4387e12af8b905bde7a1aa67ffb6ff3fbe0
+Author: GAnderson <garronanderson4321@gmail.com>
+Date:   Fri Jun 16 18:24:04 2023 -0500
+
+    Fixed alphabet fully. Pushed print speed envelope to probable maximum.
+
+commit 788642962582c33d42ad4fc9fc5798c2039383a3
+Author: GAnderson <garronanderson4321@gmail.com>
+Date:   Thu Jun 15 14:52:17 2023 -0500
+
+    Refactored end of TWComms.py. Fixed codes for the letters a, c, and r.
+
+commit 98c0b9d80eb11c6fb790f19662bedafb62414004
+Author: GAnderson <garronanderson4321@gmail.com>
+Date:   Wed Jun 14 20:43:43 2023 -0500
+
+    Adding initial files to the repo.

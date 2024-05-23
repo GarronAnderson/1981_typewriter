@@ -1,0 +1,6 @@
+Thanks for visiting my embedded systems project, "Interfacing a 1981 Electric
+Typewriter with Raspberry Pi."
+
+Have a great day!
+
+Garron Anderson

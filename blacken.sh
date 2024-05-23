@@ -1,0 +1,6 @@
+#!/bin/bash
+echo Sorting imports...
+python -m isort .
+echo Blackening code...
+python -m black .
+
