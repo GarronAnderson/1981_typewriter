@@ -61,7 +61,7 @@ class TWComms:
             self.mpdo_pin = input_pins[8]
             self.c_chan_scan_pin = input_pins[9]
         else:
-            self.input_pins = [2, 3, 4, 17, 27, 22, 10, 9, 11, 1]
+            self.input_pins = [2, 3, 4, 17, 27, 22, 10, 11, 9, 1]
             self.read_signal_pin = self.input_pins[7]
             self.mpdo_pin = self.input_pins[8]
             self.c_chan_scan_pin = self.input_pins[9]
@@ -198,16 +198,23 @@ class TWComms:
             return
         if shifted and modded:  # Sanity check
             raise TWCommsException("Characters can't be both shifted and modded.")
+        
+        if char in [" ", ",", "."]: # not affected by shift/mod
+            self._send_char(char_code)
+            return
+        
         if not (shifted or modded):
             if self.caps_lock_on:
                 self._send_char("0111111")
                 self.caps_lock_on = False
             self._send_char(char_code)
+            
         if shifted:
             if not self.caps_lock_on:
                 self._send_char("1011111")
                 self.caps_lock_on = True
             self._send_char(char_code)
+            
         if modded:
             self._send_char(char_code)
 
@@ -237,13 +244,10 @@ class TWComms:
                 self.print_char(char)
         for char in str(end):
             self.print_char(char)
-
-    def return_paper(self, num_returns=1):
-        for _ in range(num_returns):
-            self._send_char("1101100")
-
-    def return_until_readable(self):
-        self.return_paper(num_returns=7)
+            
+        # done, turn off caps lock
+        self._send_char("0111111")
+        self.caps_lock_on = False
 
     def read_input_lines(self):
         data = []
@@ -257,6 +261,7 @@ class TWComms:
 
     def getch_callback(self, _):
         data = self.read_input_lines()
+        #print(f'getch, {data}')
         if data == "0111111":
             self._shifted = True
         elif data == "1111111":
@@ -265,25 +270,31 @@ class TWComms:
             self._data = data
 
     def c_chan_callback(self, _):
-        # print("C Chan")
-        try:
-            char = self.input_lookup[self._data, self._shifted, self._modded]
-        except KeyError:
-            logging.warning(
-                f"Cannot decode character ({self._data}, {self._shifted}, {self._modded}). Continuing anyway."
-            )
-            return
+        #print("C Chan")
+        if self._data != "0000000":
+            try:
+                #print(f"calling self.input_lookup[{self._data}, {self._shifted}, {self._modded}]")
+                char = self.input_lookup[self._data, self._shifted, self._modded]
+            except KeyError:
+                logging.warning(
+                    f"Cannot decode character ({self._data}, {self._shifted}, {self._modded}). Continuing anyway."
+                )
+                return
 
-        if char != "" and char != "SHIFT":
-            self._possibles.append(char)
-        self._data = "0000000"
-        self._shifted = self._modded = False
+            if char != "" and char != "SHIFT":
+                self._possibles.append(char)
+            self._data = "0000000"
+            self._shifted = self._modded = False
 
     def mpdo_callback(self, _):
+        #print("mpdo falling")
+        #print(f"possibles: <{self._possibles}>")
         if len(self._possibles) != 0:
             most_common = Counter(self._possibles).most_common(1)[0][0]
             self._buffer.appendleft(most_common)
         self._possibles = []
+        #print(f"new buffer: {self._buffer}")
+        
 
     def avaliable(self):
         return len(self._buffer)
@@ -295,42 +306,6 @@ class TWComms:
         text = "".join(self._buffer)
         self._buffer.clear()
         return text[::-1]
-
-    def process_lines(self, text, PAPER_WIDTH=67):
-        """
-        Process lines for printing on a piece of paper with line numbers.
-
-        Parameters
-        ----------
-        text : list
-            Ideally from file.readlines().
-        PAPER_WIDTH : int, optional
-            The number of characters that fit horizontally on the paper.
-            The default is 67.
-
-        Returns
-        -------
-        text_lines : list
-            A list of PAPER_WIDTH - 5 long lines with full words,
-            split at spaces or newlines.
-
-        """
-
-        text_joined = " ".join(text)
-
-        text_split = [x + " " for x in text_joined.split(" ")]
-
-        current_line = ""
-        text_lines = []
-
-        for string in text_split:
-            current_line += string
-            current_line_len = len(current_line)
-            if (current_line_len > (PAPER_WIDTH - 5)) or ("\n" in string):
-                text_lines += [current_line]
-                current_line = ""
-
-        return text_lines
 
     def summarize_email(self, gmailObjects):
         if isinstance(gmailObjects, (ezgmail.GmailThread, ezgmail.GmailMessage)):
@@ -352,34 +327,6 @@ class TWComms:
             for itemSenders, itemSnippet, itemLatestTimestamp in summaryText
         ]
         return "\n".join(["%s - %s - %s" % text for text in summaryText])
-
-    def prompt(self, line_before="", prompt="> ", return_before=True):
-        if return_before:
-            self.return_paper()
-
-        if line_before:
-            self.print_string_ln(line_before)
-
-        while not self.avaliable():
-            pass
-
-        out = ""
-        char = self.read()
-
-        while char != "\n":
-            out += char
-            char = self.read()
-
-        return out
-
-    def edit_lines(self, text):
-        pass
-
-    def print_lines(self, lines):
-        for line in lines:
-            line = line.strip()
-            print(line, end="\n")
-
 
 import signal
 import sys

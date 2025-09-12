@@ -6,5 +6,5 @@ import codes
 
 alphabet = "abcdefghijklmnopqrstuvwxyz"
 
-T.print_char("\n")
+T.print("")
 T.print(alphabet)
