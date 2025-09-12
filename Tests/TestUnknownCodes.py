@@ -1,5 +1,5 @@
-import TWComms
 import codes
+import TWComms
 
 T = TWComms.TWComms()
 

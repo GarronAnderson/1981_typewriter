@@ -1,7 +1,7 @@
 import time
 
-print('echo Hello, world.')
+print("echo Hello, world.")
 
 time.sleep(2)
 
-print('echo This is a test.')
+print("echo This is a test.")

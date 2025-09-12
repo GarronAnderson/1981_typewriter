@@ -13,13 +13,14 @@ GPIO.setwarnings(False)
 # import GPIO_Mockup as GPIO
 
 
-from collections import Counter, deque
 import logging
 import time
+from collections import Counter, deque
+
+import codes
 
 # import ezgmail
 
-import codes
 
 
 class TWCommsException(Exception):
@@ -35,7 +36,7 @@ class TWComms:
         log_name=None,
         errors_only=False,
     ):
-        from codes import output_lookup, input_lookup
+        from codes import input_lookup, output_lookup
 
         """
         Set up the SmartTyper class. (init GPIOs, set up logging, prepare data structures)
@@ -198,23 +199,23 @@ class TWComms:
             return
         if shifted and modded:  # Sanity check
             raise TWCommsException("Characters can't be both shifted and modded.")
-        
-        if char in [" ", ",", "."]: # not affected by shift/mod
+
+        if char in [" ", ",", "."]:  # not affected by shift/mod
             self._send_char(char_code)
             return
-        
+
         if not (shifted or modded):
             if self.caps_lock_on:
                 self._send_char("0111111")
                 self.caps_lock_on = False
             self._send_char(char_code)
-            
+
         if shifted:
             if not self.caps_lock_on:
                 self._send_char("1011111")
                 self.caps_lock_on = True
             self._send_char(char_code)
-            
+
         if modded:
             self._send_char(char_code)
 
@@ -244,7 +245,7 @@ class TWComms:
                 self.print_char(char)
         for char in str(end):
             self.print_char(char)
-            
+
         # done, turn off caps lock
         self._send_char("0111111")
         self.caps_lock_on = False
@@ -261,7 +262,7 @@ class TWComms:
 
     def getch_callback(self, _):
         data = self.read_input_lines()
-        #print(f'getch, {data}')
+        # print(f'getch, {data}')
         if data == "0111111":
             self._shifted = True
         elif data == "1111111":
@@ -270,10 +271,10 @@ class TWComms:
             self._data = data
 
     def c_chan_callback(self, _):
-        #print("C Chan")
+        # print("C Chan")
         if self._data != "0000000":
             try:
-                #print(f"calling self.input_lookup[{self._data}, {self._shifted}, {self._modded}]")
+                # print(f"calling self.input_lookup[{self._data}, {self._shifted}, {self._modded}]")
                 char = self.input_lookup[self._data, self._shifted, self._modded]
             except KeyError:
                 logging.warning(
@@ -287,14 +288,13 @@ class TWComms:
             self._shifted = self._modded = False
 
     def mpdo_callback(self, _):
-        #print("mpdo falling")
-        #print(f"possibles: <{self._possibles}>")
+        # print("mpdo falling")
+        # print(f"possibles: <{self._possibles}>")
         if len(self._possibles) != 0:
             most_common = Counter(self._possibles).most_common(1)[0][0]
             self._buffer.appendleft(most_common)
         self._possibles = []
-        #print(f"new buffer: {self._buffer}")
-        
+        # print(f"new buffer: {self._buffer}")
 
     def avaliable(self):
         return len(self._buffer)
@@ -327,6 +327,7 @@ class TWComms:
             for itemSenders, itemSnippet, itemLatestTimestamp in summaryText
         ]
         return "\n".join(["%s - %s - %s" % text for text in summaryText])
+
 
 import signal
 import sys

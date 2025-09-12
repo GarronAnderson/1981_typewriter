@@ -6,5 +6,4 @@ import codes
 
 all_codes = codes.output_lookup.keys()
 
-T.print(' '.join(all_codes))
-
+T.print(" ".join(all_codes))

@@ -1,5 +1,6 @@
-import TWComms
 import time
+
+import TWComms
 
 T = TWComms.TWComms()
 message_bannered = open("messageBannered.txt").read() + "\n" * 6
